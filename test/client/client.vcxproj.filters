@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{dff0e8bc-3989-4f74-872f-83e668cbb18b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libs">
+      <UniqueIdentifier>{12b8c42f-0843-4e7b-b0cf-22b37510ce3a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="client.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ikcp.c">
+      <Filter>libs</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\udpserver.h">
+      <Filter>libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\udpsocket.h">
+      <Filter>libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\udptask.h">
+      <Filter>libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common.h">
+      <Filter>libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ikcp.h">
+      <Filter>libs</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\udpclient.h">
+      <Filter>libs</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

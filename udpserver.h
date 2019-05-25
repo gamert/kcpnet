@@ -132,7 +132,7 @@ public:
 			}
 			if (size < 0)
 			{
-				printf("æŽ¥æ”¶å¤±è´¥ %d,%d \n", udpsock.getsocket(), size);
+				printf("½ÓÊÕÊ§°Ü %d,%d \n", udpsock.getsocket(), size);
 				continue;
 			}
 			IUINT32 conv = ikcp_getconv(buff);

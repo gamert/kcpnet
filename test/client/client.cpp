@@ -4,6 +4,7 @@
 #define TF_TYPE_DATA	2
 #define TF_TYPE_END 	3
 
+//client-server session:
 class clitask :public udptask
 {
 public:
@@ -72,9 +73,9 @@ int main(int argc, char *argv[])
 	buf[0] = TF_TYPE_END;
 	c.send(buf, 1);
 
+	std::chrono::milliseconds dura(10);
 	while (c.isalive())
 	{
-		std::chrono::milliseconds dura(10);
 		std::this_thread::sleep_for(dura);
 	}
 

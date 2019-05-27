@@ -9,7 +9,10 @@
 #include <mutex>
 #include "udptask.h"
 
-template<typename T>
+/*
+	
+*/
+template<typename T /*udptask*/>
 class udpclient 
 {
 public:
@@ -66,12 +69,12 @@ public:
 	//处理tcp proxy消息
 	void loop()
 	{
+		std::chrono::milliseconds dura(1);
 		for (; !isstop;)
 		{
 			_mutex.lock();
 			utask->timerloop();
 			_mutex.unlock();
-			std::chrono::milliseconds dura(1);
 			std::this_thread::sleep_for(dura);
 		}
 	}
@@ -115,7 +118,7 @@ public:
 	}
 private:
 	udpsocket udpsock;
-	udptask* utask;
+	udptask* utask;		//keep thread safe
 	std::thread _thread;
 	std::thread _threadtm;
 	std::mutex _mutex;

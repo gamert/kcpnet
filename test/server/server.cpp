@@ -4,7 +4,7 @@
 #define TF_TYPE_DATA	2
 #define TF_TYPE_END 	3
 
-//server session:
+//server-client session:
 class sertask :public udptask
 {
 public:
@@ -24,12 +24,10 @@ public:
 	}
 	~sertask()
 	{
-		if (udpsock != NULL)
-		{
+		if (udpsock != NULL){
 			delete udpsock;
 		}
-		if (fp != NULL)
-		{
+		if (fp != NULL){
 			fclose(fp);
 		}
 	}

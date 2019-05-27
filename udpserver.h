@@ -38,7 +38,7 @@ public:
 	void loop()
 	{
 		//微秒
-		std::chrono::microseconds dura(10);
+		std::chrono::microseconds dura(1);
 		for (; !isstop;)
 		{
 			_mutex.lock();
@@ -57,7 +57,11 @@ public:
 				}
 			}
 			_mutex.unlock();
-			std::this_thread::sleep_for(dura);
+
+			_time_measure.Update();
+
+//			std::this_thread::sleep_for(dura);
+			std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 		}
 	}
 
@@ -91,7 +95,11 @@ public:
 	std::mutex _mutex;
 	std::thread _thread;
 	std::map<IUINT32, udptask*> clients;
+	time_measure_t _time_measure;
 };
+
+
+#define MAX_TDNUM 1	//线程个数..
 
 template<typename T>
 class udpserver
@@ -113,7 +121,7 @@ public:
 		isstop = false;
 		_thread = std::thread(std::bind(&udpserver::run, this));
 
-		maxtdnum = 10;
+		maxtdnum = MAX_TDNUM;
 		for (unsigned int i = 0; i < maxtdnum; i++)
 		{
 			handlethread<T>* hthread = new handlethread<T>;
@@ -154,12 +162,16 @@ public:
 				printf("接收失败 %d,%d \n", udpsock.getsocket(), size);
 				continue;
 			}
+			
+			time_measure_t::MarkTime("recvfrom");
+
 			IUINT32 conv = ikcp_getconv(buff);
 			timerthreads[conv % maxtdnum]->recv(udpsock.getsocket(), &cliaddr, conv, buff, size);
 		}
 	}
 
 private:
+
 	udpsocket udpsock;
 	std::thread _thread;
 	volatile bool isstop;

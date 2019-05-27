@@ -17,6 +17,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+//zz def
+#define MIN_KCP_TIMER		1000	//10000
+#define MAX_KCP_INTERVAL	5000	//5000	最大的
+#define MIN_KCP_INTERVAL	1		//10	最小的
 
 
 //=====================================================================
@@ -1131,7 +1135,7 @@ void ikcp_update(ikcpcb *kcp, IUINT32 current)
 
 	slap = _itimediff(kcp->current, kcp->ts_flush);
 
-	if (slap >= 10000 || slap < -10000) {
+	if (slap >= MIN_KCP_TIMER || slap < -MIN_KCP_TIMER) {
 		kcp->ts_flush = kcp->current;
 		slap = 0;
 	}
@@ -1167,8 +1171,8 @@ IUINT32 ikcp_check(const ikcpcb *kcp, IUINT32 current)
 		return current;
 	}
 
-	if (_itimediff(current, ts_flush) >= 10000 ||
-		_itimediff(current, ts_flush) < -10000) {
+	if (_itimediff(current, ts_flush) >= MIN_KCP_TIMER ||
+		_itimediff(current, ts_flush) < -MIN_KCP_TIMER) {
 		ts_flush = current;
 	}
 
@@ -1212,8 +1216,8 @@ int ikcp_setmtu(ikcpcb *kcp, int mtu)
 
 int ikcp_interval(ikcpcb *kcp, int interval)
 {
-	if (interval > 5000) interval = 5000;
-	else if (interval < 10) interval = 10;
+	if (interval > MAX_KCP_INTERVAL) interval = MAX_KCP_INTERVAL;
+	else if (interval < MIN_KCP_INTERVAL) interval = MIN_KCP_INTERVAL;
 	kcp->interval = interval;
 	return 0;
 }
@@ -1230,9 +1234,7 @@ int ikcp_nodelay(ikcpcb *kcp, int nodelay, int interval, int resend, int nc)
 		}
 	}
 	if (interval >= 0) {
-		if (interval > 5000) interval = 5000;
-		else if (interval < 10) interval = 10;
-		kcp->interval = interval;
+		ikcp_interval(kcp,interval);
 	}
 	if (resend >= 0) {
 		kcp->fastresend = resend;

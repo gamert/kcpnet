@@ -28,7 +28,7 @@ public:
 	/*
 	@addr: ipv4? dns?
 	@port:
-	@conv: 浼氳瘽ID锛寀se ID?
+	@conv: 会话ID，use ID?
 	*/
 	bool connect(const char *addr, unsigned short int port, IUINT32 conv)
 	{
@@ -66,20 +66,24 @@ public:
 		_threadtm.join();
 	}
 
-	//澶勭悊tcp proxy娑堟伅
+	//处理tcp proxy消息
 	void loop()
 	{
-		std::chrono::milliseconds dura(1);
+		//std::chrono::milliseconds dura(1);
+		std::chrono::microseconds dura(1);
 		for (; !isstop;)
 		{
 			_mutex.lock();
 			utask->timerloop();
 			_mutex.unlock();
-			std::this_thread::sleep_for(dura);
+
+			_time_measure.Update();
+
+			std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 		}
 	}
 
-	//澶勭悊udp 缃戠粶娑堟伅
+	//处理udp 网络消息
 	void run()
 	{
 		char buff[65536] = { 0 };
@@ -94,9 +98,11 @@ public:
 			}
 			if (size < 0)
 			{
-				printf("鎺ユ敹澶辫触 %d,%d \n", udpsock.getsocket(), size);
+				printf("接收失败 %d,%d \n", udpsock.getsocket(), size);
 				continue;
 			}
+			time_measure_t::MarkTime("recvfrom");
+
 			_mutex.lock();
 			utask->recv(buff, size);
 			_mutex.unlock();
@@ -113,7 +119,7 @@ public:
 
 	virtual int parsemsg(const char *buf, int len)
 	{
-		printf("鏀跺埌鏁版嵁 %s,%d\n", buf, len);
+		printf("收到数据 %s,%d\n", buf, len);
 		return 0;
 	}
 private:
@@ -123,6 +129,8 @@ private:
 	std::thread _threadtm;
 	std::mutex _mutex;
 	volatile bool isstop;
+
+	time_measure_t _time_measure;
 };
 
 #endif

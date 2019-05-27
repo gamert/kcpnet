@@ -4,6 +4,11 @@
 #define TF_TYPE_DATA	2
 #define TF_TYPE_END 	3
 
+//计算ping-pong
+#define TF_TYPE_PING 	127
+#define TF_TYPE_PONG 	126
+
+
 //server-client session:
 class sertask :public udptask
 {
@@ -92,6 +97,17 @@ public:
 				}
 				printf("接收文件完成 \n");
 				closeit = true;
+			}
+			break;
+		case TF_TYPE_PING:
+			{
+				time_measure_t::MarkTime("TF_TYPE_PING");
+
+				char buf2[64];
+				memcpy(buf2, buf, len);
+				buf2[0] = TF_TYPE_PONG;
+				this->send(buf2, len);
+				//printf("接收文件完成 \n");
 			}
 			break;
 		default:

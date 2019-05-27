@@ -4,7 +4,6 @@
 #ifdef _WIN32
 #include <winsock2.h> 
 #pragma comment(lib,"ws2_32.lib")
-#define close(x) closesocket(x)
 typedef int socklen_t;
 #else
 #include <netinet/in.h>
@@ -21,6 +20,7 @@ typedef int socklen_t;
 #include <unistd.h>
 #include <fcntl.h>
 typedef int SOCKET;
+#define closesocket(x) close(x)
 #endif
 
 class udpsocket
@@ -90,7 +90,7 @@ public:
 
 	void shutdown()
 	{
-		::close(udpsock);
+		::closesocket(udpsock);
 	}
 
 	int recvfrom(char * buf, int len, struct sockaddr * from, socklen_t* fromlen)

@@ -6,10 +6,60 @@
 #include "common.h"
 #include "udpsocket.h"
 
+
+
+
+class time_measure_t
+{
+public:
+#define MEASURE_NUM 3000
+
+	std::chrono::duration<double> time_span;
+	int count;
+	std::chrono::steady_clock::time_point t1;
+	time_measure_t() :count(0)
+	{
+		t1 = std::chrono::steady_clock::now();
+	}
+
+	void Update()
+	{
+#if false
+		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+		time_span += std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+		t1 = t2;
+		count++;
+		if (count >= MEASURE_NUM)
+		{
+			printf("time_measure_t: %llf \n", time_span.count() / MEASURE_NUM);
+			time_span = std::chrono::duration<double>(0);
+			count = 0;
+		}
+#endif
+	}
+
+	static void MarkTime(const char *prefix)
+	{
+#if false
+		static 	std::chrono::steady_clock::time_point last_t1 = std::chrono::steady_clock::now();
+		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+		//std::time_t tt;
+		//tt = system_clock::to_time_t(today);
+		std::chrono::duration<double> dt  = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - last_t1);
+
+		printf("MarkTime:%s: %lld,  dt = %llf\n", prefix, t2, dt);
+		last_t1 = t2;
+#endif
+	}
+
+};
+
+
 /*
 	a control session:
 */
-#define THINK_INTERVAL 10000	//microsecond
+#define THINK_INTERVAL 2000			//microsecond def:10000 us
+#define TIMEOUT_INTERVAL 1000000*5	//microsecond 
 class udptask
 {
 public:
@@ -19,7 +69,7 @@ public:
 		kcp = NULL;
 		current = 0;
 		nexttime = 0;
-		alivetime = nexttime + THINK_INTERVAL;
+		alivetime = nexttime + TIMEOUT_INTERVAL;
 		memset(buffer, 0, sizeof(buffer));
 	}
 
@@ -73,10 +123,12 @@ public:
 			//ikcp_nodelay(kcp, 0, 10, 0, 0);
 			//ikcp_nodelay(kcp, 0, 10, 0, 1);
 			//ikcp_nodelay(kcp, 1, 10, 2, 1);
-			ikcp_nodelay(kcp, 1, 5, 1, 1); // 设置成1次ACK跨越直接重传, 这样反应速度会更快. 内部时钟5毫秒.
+			ikcp_nodelay(kcp, 1, 1, 2, 1); // 设置成1次ACK跨越直接重传, 这样反应速度会更快. 内部时钟5毫秒.
 
 			kcp->rx_minrto = 10;
 			kcp->fastresend = 1;
+
+			//kcp->interval = 1;
 			break;
 		default:
 			printf("%d,%d 模式错误!\n", conv, mode);
@@ -86,13 +138,16 @@ public:
 		return true;
 	}
 
+	/*
+		接收，同时设定超时时间...
+	*/
 	int recv(const char  * buf, int len)
 	{
 		int nret = ikcp_input(kcp, buf, len);
 		if (nret == 0)
 		{
 			nexttime = iclock();
-			alivetime = nexttime + THINK_INTERVAL;
+			alivetime = nexttime + TIMEOUT_INTERVAL;
 		}
 		return nret;
 	}
@@ -103,7 +158,7 @@ public:
 		if (nret == 0)
 		{
 			nexttime = iclock();
-			alivetime = nexttime + THINK_INTERVAL;
+			alivetime = nexttime + TIMEOUT_INTERVAL;
 		}
 		//printf("发送数据 %d,%d,%d\n", conv, len, nret);
 		return nret;
@@ -115,7 +170,6 @@ public:
 	void timerloop()
 	{
 		current = iclock();
-
 		if (nexttime > current)
 		{
 			return;
@@ -153,6 +207,8 @@ public:
 private:
 	static int udp_output(const char *buf, int len, ikcpcb *kcp, void *user)
 	{
+		time_measure_t::MarkTime("udp_output");
+
 		return ((udpsocket*)user)->sendto(buf, len);
 	}
 
@@ -169,5 +225,11 @@ private:
 	IUINT32 alivetime;
 	char buffer[65536];
 };
+
+
+
+
+
+
 
 #endif

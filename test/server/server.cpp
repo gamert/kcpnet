@@ -4,9 +4,15 @@
 #define TF_TYPE_DATA	2
 #define TF_TYPE_END 	3
 
+//server session:
 class sertask :public udptask
 {
 public:
+	/*
+		@conv: client id
+		@usocket:client sock
+		@paddr: client addr
+	*/
 	sertask(IUINT32 conv, SOCKET usocket, struct sockaddr_in *paddr)
 	{
 		udpsock = new udpsocket(usocket, paddr);
@@ -35,6 +41,10 @@ public:
 		}
 		return udptask::isalive();
 	}
+	
+	/*
+		...
+	*/
 	virtual int parsemsg(const char *buf, int len)
 	{
 		if (len < 1)
@@ -114,9 +124,9 @@ int main(int argc, char *argv[])
 
 	printf("server: %s, %d\n",ip,port);
 
+	std::chrono::milliseconds dura(10);
 	for (;;)
 	{
-		std::chrono::milliseconds dura(10);
 		std::this_thread::sleep_for(dura);
 	}
 

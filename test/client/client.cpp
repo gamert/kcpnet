@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
 
 	srand((unsigned)time(NULL));
 
+	//rand
 	udpclient<clitask> c;
 	c.connect(argv[1], 9001, rand());
 

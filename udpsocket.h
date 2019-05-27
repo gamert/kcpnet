@@ -41,6 +41,10 @@ public:
 
 	}
 
+	/*
+	@addr:
+	@port:
+	*/
 	bool bind(const char *addr, unsigned int short port)
 	{
 		udpsock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -64,6 +68,11 @@ public:
 		return true;
 	}
 
+	/*
+		for client...
+		@addr:
+		@port:
+	*/
 	bool connect(const char *addr, unsigned short int port)
 	{
 		if (!this->bind("0.0.0.0", 0))

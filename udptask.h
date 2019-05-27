@@ -6,6 +6,10 @@
 #include "common.h"
 #include "udpsocket.h"
 
+/*
+	a control session:
+*/
+#define THINK_INTERVAL 10000	//microsecond
 class udptask
 {
 public:
@@ -15,7 +19,7 @@ public:
 		kcp = NULL;
 		current = 0;
 		nexttime = 0;
-		alivetime = nexttime + 10000;
+		alivetime = nexttime + THINK_INTERVAL;
 		memset(buffer, 0, sizeof(buffer));
 	}
 
@@ -29,6 +33,10 @@ public:
 		printf("关闭连接 %d\n", conv);
 	}
 
+	/*
+		@conv:
+		@udpsock:
+		*/
 	bool init(IUINT32 conv, udpsocket *udpsock, int mode = 2)
 	{
 		if (udpsock == NULL)
@@ -84,7 +92,7 @@ public:
 		if (nret == 0)
 		{
 			nexttime = iclock();
-			alivetime = nexttime + 10000;
+			alivetime = nexttime + THINK_INTERVAL;
 		}
 		return nret;
 	}
@@ -95,12 +103,15 @@ public:
 		if (nret == 0)
 		{
 			nexttime = iclock();
-			alivetime = nexttime + 10000;
+			alivetime = nexttime + THINK_INTERVAL;
 		}
 		//printf("发送数据 %d,%d,%d\n", conv, len, nret);
 		return nret;
 	}
 
+	/*
+		for ikcp_update
+	*/
 	void timerloop()
 	{
 		current = iclock();

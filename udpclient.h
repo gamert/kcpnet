@@ -21,6 +21,12 @@ public:
 			delete utask;
 		}
 	}
+
+	/*
+	@addr: ipv4? dns?
+	@port:
+	@conv: 会话ID，use ID?
+	*/
 	bool connect(const char *addr, unsigned short int port, IUINT32 conv)
 	{
 		if (!udpsock.connect(addr, port))
@@ -57,6 +63,7 @@ public:
 		_threadtm.join();
 	}
 
+	//处理tcp proxy消息
 	void loop()
 	{
 		for (; !isstop;)
@@ -69,6 +76,7 @@ public:
 		}
 	}
 
+	//处理udp 网络消息
 	void run()
 	{
 		char buff[65536] = { 0 };

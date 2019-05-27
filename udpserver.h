@@ -11,6 +11,9 @@
 #include<vector>
 #include "udptask.h"
 
+/*
+	job thread:
+*/
 template<typename T>
 class handlethread
 {
@@ -34,6 +37,8 @@ public:
 	}
 	void loop()
 	{
+		//微秒
+		std::chrono::microseconds dura(10);
 		for (; !isstop;)
 		{
 			_mutex.lock();
@@ -52,10 +57,18 @@ public:
 				}
 			}
 			_mutex.unlock();
-			std::chrono::microseconds dura(10);
 			std::this_thread::sleep_for(dura);
 		}
 	}
+
+	/*
+		收到raw udp报文
+	@udpsock:
+	@paddr:
+	@conv: the user id...
+	@buff:
+	@size:
+	*/
 	void recv(SOCKET udpsock, struct sockaddr_in *paddr, IUINT32 conv, const char *buff, int size)
 	{
 		udptask *pclient = NULL;
@@ -84,6 +97,12 @@ template<typename T>
 class udpserver
 {
 public:
+
+	/*
+
+	@addr:
+	@port:
+	*/
 	bool bind(const char *addr, unsigned int short port)
 	{
 		if (!udpsock.bind(addr, port))
